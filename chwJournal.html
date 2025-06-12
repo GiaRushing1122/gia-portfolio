@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHW Training Journal</title>
+  <script type="module">
+    // Import Firebase libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get, child, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCYtQ2TbnxWTx6L6-jpG5Z5DNboIyVug4",
+      authDomain: "chwjournal.firebaseapp.com",
+      projectId: "chwjournal",
+      storageBucket: "chwjournal.firebasestorage.app",
+      messagingSenderId: "111412095394",
+      appId: "1:111412095394:web:c0d35d947ecc446e54eafb"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let count = 1;
+    const entriesDiv = document.getElementById("entries");
+
+    function addEntry(title = `Day ${count}`) {
+      const entryId = `entry-${Date.now()}`;
+      const entry = document.createElement("section");
+      entry.innerHTML = `
+        <h2 contenteditable="true">${title}</h2>
+        <p><strong>Reflections:</strong></p>
+        <textarea id="${entryId}-reflections"></textarea>
+        <p><strong>Questions or Resources:</strong></p>
+        <textarea id="${entryId}-resources"></textarea>
+        <button onclick="saveEntry('${entryId}', this)">💾 Save</button>
+      `;
+      entriesDiv.appendChild(entry);
+      count++;
+    }
+
+    window.saveEntry = function(entryId, btn) {
+      const reflections = document.getElementById(`${entryId}-reflections`).value;
+      const resources = document.getElementById(`${entryId}-resources`).value;
+      const data = {
+        reflections,
+        resources,
+        timestamp: new Date().toISOString()
+      };
+      const newEntryRef = push(ref(db, 'entries'));
+      set(newEntryRef, data).then(() => {
+        btn.textContent = '✅ Saved';
+        setTimeout(() => (btn.textContent = '💾 Save'), 2000);
+      });
+    };
+
+    window.onload = () => {
+      addEntry("Day 1: CHW Role and History");
+    };
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 8px;
+    }
+    section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CHW Training Interactive Journal</h1>
+    <p>Documenting my journey and reflections of LACHON's CHW Training</p>
+  </header>
+
+  <div id="entries"></div>
+
+  <button onclick="addEntry()">➕ Add Training Day</button>
+
+</body>
+</html>
